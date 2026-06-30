@@ -217,6 +217,9 @@
     opacity:1;pointer-events:auto}
   .vid-btn:hover{background:linear-gradient(95deg,var(--ember),var(--cyan));color:#06070a;border-color:transparent;transform:translateX(-50%) translateY(-2px)}
   [data-video-slot].has-media .vid-btn{bottom:14px;font-size:10.5px;padding:7px 14px}
+
+  .auto-photo{opacity:0;transition:opacity .5s ease}
+  [data-video-slot].has-media .auto-photo{opacity:1}
   [data-video-slot] video.user-media,[data-video-slot] img.user-media{
     position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:inherit}
   [data-video-slot].has-media .media__c,[data-video-slot].has-media .reel__c{display:none}
@@ -314,12 +317,13 @@
 </style>
 <style>
   /* ---------- WORKS ---------- */
-  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+  .filters{-webkit-overflow-scrolling:touch;display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
   .filter{font-family:var(--ui);font-size:12px;letter-spacing:.06em;color:var(--mist);
     background:transparent;border:1px solid var(--line);padding:10px 18px;border-radius:30px;cursor:pointer;transition:.25s var(--ease)}
   .filter:hover{color:var(--paper);border-color:var(--line-warm)}
   .filter.active{background:linear-gradient(95deg,var(--ember),var(--ember-deep));color:#fff;border-color:transparent;font-weight:600}
   .gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:30px}
+  .media-rowbreak{grid-column:1 / -1;height:0;margin:0;padding:0;border:0}
   /* ---- lite youtube embeds ---- */
   .media__yt{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;border-radius:inherit}
   .yt-lite{position:absolute;inset:0;z-index:1;cursor:pointer;border-radius:inherit;overflow:hidden;
@@ -370,6 +374,10 @@
   .logo:hover{border-color:var(--line-cool);background:var(--panel-2)}
   .logo b{display:block;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.08em;color:#5b5a62}
   .logo span{font-size:11px;color:#43424a}
+  .logo img{max-width:74%;max-height:62%;width:auto;height:auto;object-fit:contain;
+    filter:grayscale(1) brightness(0) invert(.78);opacity:.7;transition:.35s var(--ease)}
+  .logo:hover img{filter:grayscale(0) brightness(1) invert(0);opacity:1}
+  .logo:has(img){border-style:solid;background:var(--panel)}
 
   /* ---------- CONTACT ---------- */
   #contact{position:relative;overflow:hidden}
@@ -404,7 +412,10 @@
     .svc{grid-template-columns:repeat(2,1fr)}
     .proc{grid-template-columns:repeat(2,1fr)}.proc__line{display:none}
     .nav__links{display:none}.nav__cta{display:none}.burger{display:flex}
-    .gallery .media[data-span]{grid-column:span 12 !important;aspect-ratio:16/9}
+    .gallery{gap:13px}
+    .media[data-span="full"],.media[data-span="wide"]{grid-column:span 12;aspect-ratio:16/9}
+    .media[data-span="tall"]{grid-column:span 6;aspect-ratio:9/16}
+    .media[data-span="std"]{grid-column:span 6;aspect-ratio:4/3}
     .portrait-bg__img{width:min(72%,820px);background-position:center top;opacity:.62}
     .portrait-bg__veil{background:
       linear-gradient(180deg,rgba(6,6,7,.2),rgba(6,6,7,.55) 55%,var(--void) 100%),
@@ -413,6 +424,14 @@
   }
   @media(max-width:560px){
     .stats,.strip,.svc,.proc{grid-template-columns:1fr}
+    .wrap{padding-left:18px;padding-right:18px}
+    .gallery{gap:12px}
+    .media[data-span="full"],.media[data-span="wide"]{grid-column:span 12;aspect-ratio:16/9}
+    .media[data-span="tall"]{grid-column:span 12;aspect-ratio:9/16;max-width:300px;margin:0 auto;width:100%}
+    .media[data-span="std"]{grid-column:span 12;aspect-ratio:4/3}
+    .filters{gap:7px}
+    .filter{font-size:11px;padding:8px 13px}
+    .h-sec{font-size:clamp(30px,8vw,40px)}
     .hero{padding-top:110px}
     .sign-big{font-size:22px}
     .portrait-bg__img{display:block;width:100%;left:0;right:0;opacity:.2;background-position:center 16%;-webkit-mask-image:none;mask-image:none}
@@ -515,7 +534,7 @@
         <div class="chips">
           <span class="chip">Eventos</span>
           <span class="chip">Institucionais</span>
-          <span class="chip">Empresas</span>
+          <span class="chip">Empresariais</span>
           <span class="chip">Campanhas</span>
         </div>
         <p class="hero__tag">Transformo ideias em <span class="g">histórias</span> que geram impacto.</p>
@@ -633,84 +652,124 @@
     <div class="wrap">
       <div class="eyebrow reveal"><span class="dot"></span>Meus trabalhos <span class="tc">SCENE 05 · 00:05:33</span></div>
       <h2 class="h-sec reveal d1">Portfólio em <span class="g">cena</span></h2>
-      <p class="lede reveal d2">Uma seleção de trabalhos em vídeo. Filtre por categoria e toque para assistir.</p>
+      <p class="lede reveal d2">Trabalhos por categoria — toque em um vídeo para assistir aqui mesmo.</p>
 
       <div class="filters reveal d2" id="filters">
         <button class="filter active" data-filter="all">Todos</button>
         <button class="filter" data-filter="eventos">Eventos</button>
         <button class="filter" data-filter="institucionais">Institucionais</button>
-        <button class="filter" data-filter="campanhas">Campanhas</button>
-        <button class="filter" data-filter="digital">Digital</button>
+        <button class="filter" data-filter="bastidores">Bastidores</button>
+        <button class="filter" data-filter="fotos">Fotos</button>
       </div>
 
       <div class="gallery" id="gallery">
-        <div class="media reveal has-video" data-span="full" data-cat="institucionais">
-          <span class="media__tc">00:00:00</span><span class="media__cat">Destaque</span>
-          <div class="yt-lite" data-yt="x3FkWHsi7ew" role="button" tabindex="0" aria-label="Assistir: Vídeo destaque" style="background-image:url('https://i.ytimg.com/vi/x3FkWHsi7ew/hqdefault.jpg')">
-            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
-        </div>
-
-        <div class="media reveal has-video" data-span="tall" data-cat="digital">
-          <span class="media__tc">00:00:18</span><span class="media__cat">Reel</span>
-          <div class="yt-lite" data-yt="8PbuaeFqx6w" role="button" tabindex="0" aria-label="Assistir: Reel vertical 1" style="background-image:url('https://i.ytimg.com/vi/8PbuaeFqx6w/hqdefault.jpg')">
-            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
-        </div>
-
-        <div class="media reveal d1 has-video" data-span="tall" data-cat="digital">
-          <span class="media__tc">00:00:36</span><span class="media__cat">Reel</span>
-          <div class="yt-lite" data-yt="eUKfiqW1TdY" role="button" tabindex="0" aria-label="Assistir: Reel vertical 2" style="background-image:url('https://i.ytimg.com/vi/eUKfiqW1TdY/hqdefault.jpg')">
-            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
-        </div>
-
-        <div class="media reveal d2 has-video" data-span="tall" data-cat="digital">
-          <span class="media__tc">00:00:54</span><span class="media__cat">Reel</span>
-          <div class="yt-lite" data-yt="Sc2rRVmswJc" role="button" tabindex="0" aria-label="Assistir: Reel vertical 3" style="background-image:url('https://i.ytimg.com/vi/Sc2rRVmswJc/hqdefault.jpg')">
-            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
-        </div>
-
-        <div class="media reveal d3 has-video" data-span="tall" data-cat="digital">
-          <span class="media__tc">00:01:12</span><span class="media__cat">Reel</span>
-          <div class="yt-lite" data-yt="Gpks4mtvgvw" role="button" tabindex="0" aria-label="Assistir: Reel vertical 4" style="background-image:url('https://i.ytimg.com/vi/Gpks4mtvgvw/hqdefault.jpg')">
-            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
-        </div>
-
-        <div class="media reveal has-video" data-span="wide" data-cat="campanhas">
-          <span class="media__tc">00:01:40</span><span class="media__cat">Campanha</span>
-          <div class="yt-lite" data-yt="9ORjqRjTgIA" role="button" tabindex="0" aria-label="Assistir: Vídeo de campanha" style="background-image:url('https://i.ytimg.com/vi/9ORjqRjTgIA/hqdefault.jpg')">
+        <div class="media reveal has-video" data-span="wide" data-cat="eventos">
+          <span class="media__tc">00:00:00</span><span class="media__cat">Evento</span>
+          <div class="yt-lite" data-yt="x3FkWHsi7ew" role="button" tabindex="0" aria-label="Assistir: Evento 1" style="background-image:url('https://i.ytimg.com/vi/x3FkWHsi7ew/hqdefault.jpg')">
             <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           </div>
         </div>
 
         <div class="media reveal d1 has-video" data-span="wide" data-cat="eventos">
-          <span class="media__tc">00:02:10</span><span class="media__cat">Evento</span>
-          <div class="yt-lite" data-yt="-XWhiCNcCsk" role="button" tabindex="0" aria-label="Assistir: Vídeo de evento" style="background-image:url('https://i.ytimg.com/vi/-XWhiCNcCsk/hqdefault.jpg')">
+          <span class="media__tc">00:00:22</span><span class="media__cat">Evento</span>
+          <div class="yt-lite" data-yt="WgksIWELCEA" role="button" tabindex="0" aria-label="Assistir: Evento 2" style="background-image:url('https://i.ytimg.com/vi/WgksIWELCEA/hqdefault.jpg')">
             <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           </div>
         </div>
 
-        <div class="media reveal d2 has-video" data-span="wide" data-cat="institucionais">
-          <span class="media__tc">00:02:40</span><span class="media__cat">Vídeo</span>
-          <div class="yt-lite" data-yt="WgksIWELCEA" role="button" tabindex="0" aria-label="Assistir: Vídeo horizontal" style="background-image:url('https://i.ytimg.com/vi/WgksIWELCEA/hqdefault.jpg')">
+        <div class="media reveal d2 has-video" data-span="wide" data-cat="eventos">
+          <span class="media__tc">00:00:44</span><span class="media__cat">Evento</span>
+          <div class="yt-lite" data-yt="-XWhiCNcCsk" role="button" tabindex="0" aria-label="Assistir: Evento 3" style="background-image:url('https://i.ytimg.com/vi/-XWhiCNcCsk/hqdefault.jpg')">
             <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           </div>
         </div>
 
-        <div class="media reveal" data-span="std" data-cat="eventos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento">
-          <span class="media__glow"></span><span class="media__tc">00:03:10</span><span class="media__cat">Foto</span>
-          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento</div><div class="media__hint">Em breve</div></div>
+        <div class="media reveal d3 has-video" data-span="wide" data-cat="eventos">
+          <span class="media__tc">00:00:66</span><span class="media__cat">Evento</span>
+          <div class="yt-lite" data-yt="_zoL9n4cC1k" role="button" tabindex="0" aria-label="Assistir: Evento 4" style="background-image:url('https://i.ytimg.com/vi/_zoL9n4cC1k/hqdefault.jpg')">
+            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+        </div>
+
+        <div class="media reveal has-video" data-span="tall" data-cat="institucionais">
+          <span class="media__tc">00:01:00</span><span class="media__cat">Institucional</span>
+          <div class="yt-lite" data-yt="S5_6g1ac6NU" role="button" tabindex="0" aria-label="Assistir: Institucional 1" style="background-image:url('https://i.ytimg.com/vi/S5_6g1ac6NU/hqdefault.jpg')">
+            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+        </div>
+
+        <div class="media reveal d1 has-video" data-span="tall" data-cat="institucionais">
+          <span class="media__tc">00:01:18</span><span class="media__cat">Institucional</span>
+          <div class="yt-lite" data-yt="6NeAkBKcK6w" role="button" tabindex="0" aria-label="Assistir: Institucional 2" style="background-image:url('https://i.ytimg.com/vi/6NeAkBKcK6w/hqdefault.jpg')">
+            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+        </div>
+
+        <div class="media reveal d2 has-video" data-span="tall" data-cat="institucionais">
+          <span class="media__tc">00:01:36</span><span class="media__cat">Institucional</span>
+          <div class="yt-lite" data-yt="7fPuGyET-7k" role="button" tabindex="0" aria-label="Assistir: Institucional 3" style="background-image:url('https://i.ytimg.com/vi/7fPuGyET-7k/hqdefault.jpg')">
+            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+        </div>
+
+        <div class="media reveal has-video" data-span="tall" data-cat="bastidores">
+          <span class="media__tc">00:02:00</span><span class="media__cat">Bastidores</span>
+          <div class="yt-lite" data-yt="Bkq0iuwymbg" role="button" tabindex="0" aria-label="Assistir: Bastidores" style="background-image:url('https://i.ytimg.com/vi/Bkq0iuwymbg/hqdefault.jpg')">
+            <span class="yt-lite__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+        </div>
+
+                <div class="media-rowbreak" aria-hidden="true"></div>
+
+        <div class="media reveal" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 1">
+          <img class="user-media auto-photo" src="fotos/evento-01.jpg" alt="Foto de evento 1 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:03:00</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 1</div><div class="media__hint">Em breve · 4:3</div></div>
           <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
           <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
           <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
         </div>
 
-        <div class="media reveal d1" data-span="std" data-cat="institucionais" data-video-slot tabindex="0" role="button" aria-label="Foto / bastidores">
-          <span class="media__glow"></span><span class="media__tc">00:03:30</span><span class="media__cat">Foto</span>
-          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto / bastidores</div><div class="media__hint">Em breve</div></div>
+        <div class="media reveal d1" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 2">
+          <img class="user-media auto-photo" src="fotos/evento-02.jpg" alt="Foto de evento 2 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:03:12</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 2</div><div class="media__hint">Em breve · 4:3</div></div>
+          <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
+          <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
+          <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
+        </div>
+
+        <div class="media reveal d2" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 3">
+          <img class="user-media auto-photo" src="fotos/evento-03.jpg" alt="Foto de evento 3 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:03:24</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 3</div><div class="media__hint">Em breve · 4:3</div></div>
+          <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
+          <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
+          <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
+        </div>
+
+        <div class="media reveal" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 4">
+          <img class="user-media auto-photo" src="fotos/evento-04.jpg" alt="Foto de evento 4 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:03:36</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 4</div><div class="media__hint">Em breve · 4:3</div></div>
+          <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
+          <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
+          <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
+        </div>
+
+        <div class="media reveal d1" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 5">
+          <img class="user-media auto-photo" src="fotos/evento-05.jpg" alt="Foto de evento 5 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:03:48</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 5</div><div class="media__hint">Em breve · 4:3</div></div>
+          <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
+          <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
+          <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
+        </div>
+
+        <div class="media reveal d2" data-span="std" data-cat="fotos" data-video-slot tabindex="0" role="button" aria-label="Foto de evento 6">
+          <img class="user-media auto-photo" src="fotos/evento-06.jpg" alt="Foto de evento 6 - João Siqueira" loading="lazy" onload="this.closest('[data-video-slot]').classList.add('has-media')" onerror="this.style.display='none'" />
+          <span class="media__glow"></span><span class="media__tc">00:04:00</span><span class="media__cat">Foto</span>
+          <div class="media__c"><div class="media__play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg></div><div class="media__label">Foto de evento 6</div><div class="media__hint">Em breve · 4:3</div></div>
           <button class="vid-btn" type="button" data-video-trigger>Adicionar foto</button>
           <input type="file" accept="image/*" class="vid-input" data-video-input hidden />
           <button class="vid-remove" type="button" data-video-remove aria-label="Remover mídia">&times;</button>
@@ -724,7 +783,7 @@
     <div class="wrap">
       <div class="eyebrow reveal"><span class="dot"></span>Marcas &amp; clientes <span class="tc">SCENE 06 · 00:07:11</span></div>
       <h2 class="h-sec reveal d1">Marcas que <span class="g">confiam</span></h2>
-      <p class="lede reveal d2">Insira aqui os logos dos seus clientes. Passe o mouse para pausar.</p>
+      <p class="lede reveal d2">Marcas e empresas para as quais já produzi conteúdo audiovisual.</p>
     </div>
     <div class="marquee reveal d2">
       <div class="marquee__track" id="track"></div>
@@ -930,11 +989,34 @@
     /* ---------- brands marquee (duplicated for loop) ---------- */
     var track=document.getElementById('track');
     if(track){
-      var names=['CLIENTE 01','CLIENTE 02','CLIENTE 03','CLIENTE 04','CLIENTE 05','CLIENTE 06','CLIENTE 07'];
-      var html='';
-      function block(){ names.forEach(function(n){ html+='<div class="logo"><b>LOGO</b><span>'+n.toLowerCase()+'</span></div>'; }); }
-      block(); block(); /* duplicate so -50% loops seamlessly */
-      track.innerHTML=html;
+      // Seletor automático de logos: tenta logos/marca-01.png ... marca-30.png.
+      // Coloque seus arquivos na pasta "logos/" com esses nomes e eles aparecem sozinhos.
+      var MAX_LOGOS=30, found=[], checked=0;
+      function render(){
+        if(!found.length){
+          // nenhum logo ainda: mostra um aviso discreto (some quando você adicionar)
+          document.getElementById('brands').style.display='none';
+          return;
+        }
+        found.sort();
+        var inner=found.map(function(src){
+          return '<div class="logo"><img src="'+src+'" alt="Logo de marca" loading="lazy"></div>';
+        }).join('');
+        // duplica para o loop -50% ficar contínuo
+        track.innerHTML=inner+inner;
+        // se forem poucos, triplica para preencher a faixa
+        if(found.length<5) track.innerHTML=inner+inner+inner+inner;
+      }
+      for(var i=1;i<=MAX_LOGOS;i++){
+        (function(n){
+          var pad=(n<10?'0':'')+n;
+          var img=new Image();
+          var src='logos/marca-'+pad+'.png';
+          img.onload=function(){ found.push(src); if(++checked>=MAX_LOGOS) render(); };
+          img.onerror=function(){ if(++checked>=MAX_LOGOS) render(); };
+          img.src=src;
+        })(i);
+      }
     }
 
     /* ---------- video / image upload slots ---------- */
@@ -996,270 +1078,6 @@
 })();
 </script>
 
-<style id="edit-mode-base-style">
-  /* ---------- EDIT MODE ---------- */
-  .edit-fab{position:fixed;right:22px;bottom:22px;z-index:9800;
-    display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:40px;cursor:pointer;
-    font-family:var(--ui);font-weight:600;font-size:13px;letter-spacing:.04em;color:#06070a;
-    background:linear-gradient(95deg,var(--ember-bright),var(--cyan-bright));
-    box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);
-    border:none;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
-  .edit-fab:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.5)}
-  .edit-fab svg{width:18px;height:18px}
-  .edit-fab.is-active{background:linear-gradient(95deg,#ff5252,#ff8a3d)}
 
-  body.edit-mode-on [data-editable]{outline:1.5px dashed rgba(73,211,230,.45);outline-offset:3px;
-    cursor:text;border-radius:4px;transition:outline-color .2s}
-  body.edit-mode-on [data-editable]:hover{outline-color:var(--ember-bright);background:rgba(255,122,61,.06)}
-  body.edit-mode-on [data-editable]:focus{outline:2px solid var(--ember-bright);background:rgba(255,122,61,.08)}
-
-  .edit-panel{position:fixed;top:0;right:0;height:100vh;width:min(420px,92vw);z-index:9900;
-    background:rgba(11,12,15,.97);backdrop-filter:blur(18px);border-left:1px solid var(--line);
-    transform:translateX(100%);transition:transform .45s var(--ease);
-    display:flex;flex-direction:column;font-family:var(--ui)}
-  .edit-panel.open{transform:translateX(0)}
-  .edit-panel__head{padding:22px 22px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .edit-panel__title{font-family:var(--display);font-weight:700;font-size:17px;color:var(--paper)}
-  .edit-panel__title span{background:linear-gradient(95deg,var(--ember-bright),var(--cyan-bright));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .edit-panel__close{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--paper);
-    cursor:pointer;font-size:18px;display:grid;place-items:center;transition:.25s var(--ease)}
-  .edit-panel__close:hover{background:var(--ember);border-color:transparent;color:#06070a}
-  .edit-panel__body{flex:1;overflow-y:auto;padding:18px 22px 28px;display:flex;flex-direction:column;gap:18px}
-  .edit-panel__section{display:flex;flex-direction:column;gap:10px}
-  .edit-panel__label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);display:flex;align-items:center;justify-content:space-between}
-  .edit-panel__hint{font-size:12.5px;color:var(--mist);line-height:1.55}
-  .edit-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
-  .edit-toggle-row span{font-size:13.5px;color:var(--paper);font-weight:600}
-  .switch{position:relative;width:42px;height:24px;border-radius:30px;background:rgba(255,255,255,.12);cursor:pointer;transition:.25s var(--ease);flex:0 0 42px}
-  .switch.on{background:linear-gradient(95deg,var(--ember),var(--cyan))}
-  .switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.25s var(--ease)}
-  .switch.on::after{left:21px}
-  #css-editor{flex:1;min-height:260px;resize:vertical;width:100%;
-    background:#08090b;color:#cfe9ee;border:1px solid var(--line);border-radius:12px;padding:14px;
-    font-family:'SF Mono',Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;tab-size:2}
-  #css-editor:focus{outline:2px solid var(--cyan);border-color:transparent}
-  .edit-btn{font-family:var(--ui);font-weight:600;font-size:13px;letter-spacing:.03em;
-    border-radius:12px;padding:12px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--paper);
-    transition:.25s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px}
-  .edit-btn:hover{border-color:var(--line-warm);background:var(--panel-2)}
-  .edit-btn.primary{background:linear-gradient(95deg,var(--ember-bright),var(--cyan-bright));color:#06070a;border-color:transparent}
-  .edit-btn.primary:hover{filter:brightness(1.08)}
-  .edit-btn.danger:hover{border-color:#ff5252;color:#ff8a8a}
-  .edit-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .edit-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);z-index:9950;
-    background:var(--paper);color:#06070a;padding:12px 22px;border-radius:30px;font-size:13px;font-weight:600;
-    opacity:0;pointer-events:none;transition:.35s var(--ease);box-shadow:0 14px 34px rgba(0,0,0,.4)}
-  .edit-toast.show{opacity:1;transform:translate(-50%,0)}
-
-  @media(max-width:560px){
-    .edit-fab{right:14px;bottom:14px;padding:12px 16px;font-size:12px}
-    .edit-fab span.fab-label{display:none}
-  }
-</style>
-
-<!-- EDIT MODE: floating button -->
-<button class="edit-fab" id="editFab" type="button" aria-label="Editar página">
-  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-  <span class="fab-label">Editar página</span>
-</button>
-
-<!-- EDIT MODE: side panel -->
-<aside class="edit-panel" id="editPanel" aria-hidden="true">
-  <div class="edit-panel__head">
-    <div class="edit-panel__title">Modo de <span>edição</span></div>
-    <button class="edit-panel__close" id="editPanelClose" aria-label="Fechar painel">&times;</button>
-  </div>
-  <div class="edit-panel__body">
-    <div class="edit-panel__section">
-      <div class="edit-toggle-row">
-        <span>Editar textos da página</span>
-        <div class="switch" id="toggleTextEdit" role="switch" aria-checked="false"></div>
-      </div>
-      <div class="edit-panel__hint">Quando ativo, clique em qualquer texto da página para editá-lo diretamente, como num documento.</div>
-    </div>
-
-    <div class="edit-panel__section">
-      <div class="edit-panel__label"><span>CSS personalizado</span></div>
-      <div class="edit-panel__hint">Escreva CSS livre aqui — classes, ids, cores, tipografia, layout, animações. É aplicado em tempo real na página.</div>
-      <textarea id="css-editor" spellcheck="false" placeholder="/* exemplo */
-.hero__name{ color:#fff; }
-#about{ background:#000; }"></textarea>
-      <div class="edit-btn-row">
-        <button class="edit-btn primary" id="applyCss" type="button">Aplicar CSS</button>
-        <button class="edit-btn danger" id="clearCss" type="button">Limpar CSS</button>
-      </div>
-    </div>
-
-    <div class="edit-panel__section">
-      <div class="edit-panel__label"><span>Salvar alterações</span></div>
-      <div class="edit-panel__hint">Suas edições (textos, CSS e mídias adicionadas) ficam salvas neste navegador automaticamente. Para levar as alterações para outro lugar, baixe o arquivo HTML atualizado.</div>
-      <div class="edit-btn-row">
-        <button class="edit-btn" id="resetEdits" type="button">Restaurar original</button>
-        <button class="edit-btn primary" id="downloadHtml" type="button">Baixar HTML</button>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<div class="edit-toast" id="editToast"></div>
-
-<script>
-(function(){
-  var STORAGE_KEY = 'joao-portfolio-edits-v1';
-  var fab = document.getElementById('editFab');
-  var panel = document.getElementById('editPanel');
-  var closeBtn = document.getElementById('editPanelClose');
-  var textToggle = document.getElementById('toggleTextEdit');
-  var cssEditor = document.getElementById('css-editor');
-  var applyCssBtn = document.getElementById('applyCss');
-  var clearCssBtn = document.getElementById('clearCss');
-  var resetBtn = document.getElementById('resetEdits');
-  var downloadBtn = document.getElementById('downloadHtml');
-  var toast = document.getElementById('editToast');
-  var customStyleTag = document.createElement('style');
-  customStyleTag.id = 'custom-user-css';
-  document.head.appendChild(customStyleTag);
-
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
-  }
-
-  /* mark sensible text nodes as editable: headings, paragraphs, labels — never nested inside one another */
-  function markEditableTargets(){
-    var sel = 'h1,h2,h3,p,.hero__tag,.lede,.feat__t,.feat__b,.card__t,.card__b,.step__t,.step__b,' +
-      '.frame__t,.frame__card,.stat__l,.crow__k,.crow__v,.media__label,.media__hint,.reel__label,.reel__hint,' +
-      '.brand__txt,.hero__role,.hero__handle,.chip,.eyebrow,.contact__kick,.f,.sign,.sign-big';
-    document.querySelectorAll(sel).forEach(function(el){
-      if(el.querySelector('svg')) return; // skip elements wrapping icons
-      if(el.closest('[data-editable]')) return; // never nest an editable inside another
-      if(el.closest('.edit-panel, .edit-fab, #editToast, script, style')) return;
-      el.setAttribute('data-editable','true');
-    });
-  }
-  markEditableTargets();
-
-  function setTextEditing(on){
-    document.body.classList.toggle('edit-mode-on', on);
-    document.querySelectorAll('[data-editable]').forEach(function(el){
-      el.setAttribute('contenteditable', on ? 'true' : 'false');
-    });
-    textToggle.classList.toggle('on', on);
-    textToggle.setAttribute('aria-checked', on ? 'true' : 'false');
-  }
-
-  function openPanel(){
-    panel.classList.add('open');
-    panel.setAttribute('aria-hidden','false');
-    fab.classList.add('is-active');
-  }
-  function closePanel(){
-    panel.classList.remove('open');
-    panel.setAttribute('aria-hidden','true');
-    fab.classList.remove('is-active');
-  }
-
-  fab.addEventListener('click', function(){
-    if(panel.classList.contains('open')){ closePanel(); } else { openPanel(); }
-  });
-  closeBtn.addEventListener('click', closePanel);
-
-  textToggle.addEventListener('click', function(){
-    setTextEditing(!textToggle.classList.contains('on'));
-    saveState();
-  });
-
-  applyCssBtn.addEventListener('click', function(){
-    customStyleTag.textContent = cssEditor.value;
-    saveState();
-    showToast('CSS aplicado');
-  });
-  clearCssBtn.addEventListener('click', function(){
-    cssEditor.value = '';
-    customStyleTag.textContent = '';
-    saveState();
-    showToast('CSS removido');
-  });
-
-  /* live-apply CSS as you type, debounced */
-  var cssTimer;
-  cssEditor.addEventListener('input', function(){
-    clearTimeout(cssTimer);
-    cssTimer = setTimeout(function(){ customStyleTag.textContent = cssEditor.value; }, 250);
-  });
-
-  /* persist edits: text content of editable nodes + custom css + toggle state */
-  function saveState(){
-    try{
-      var texts = {};
-      document.querySelectorAll('[data-editable]').forEach(function(el, i){
-        if(!el.id) el.setAttribute('data-edit-id', el.getAttribute('data-edit-id') || ('ed-'+i));
-        texts[el.getAttribute('data-edit-id')] = el.innerHTML;
-      });
-      var state = {
-        css: cssEditor.value,
-        textEditOn: textToggle.classList.contains('on'),
-        texts: texts
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }catch(e){ /* storage may be unavailable */ }
-  }
-
-  function loadState(){
-    var raw;
-    try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ return; }
-    if(!raw) return;
-    try{
-      var state = JSON.parse(raw);
-      if(state.css){ cssEditor.value = state.css; customStyleTag.textContent = state.css; }
-      if(state.texts){
-        document.querySelectorAll('[data-editable]').forEach(function(el, i){
-          var id = el.getAttribute('data-edit-id') || ('ed-'+i);
-          el.setAttribute('data-edit-id', id);
-          if(state.texts[id] !== undefined){ el.innerHTML = state.texts[id]; }
-        });
-      }
-      setTextEditing(!!state.textEditOn);
-    }catch(e){}
-  }
-  loadState();
-
-  /* save text edits as they happen (debounced) */
-  var saveTimer;
-  document.addEventListener('input', function(e){
-    if(e.target.closest('[data-editable]')){
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveState, 400);
-    }
-  });
-  document.addEventListener('blur', function(e){
-    if(e.target.closest && e.target.closest('[data-editable]')) saveState();
-  }, true);
-
-  resetBtn.addEventListener('click', function(){
-    if(!confirm('Restaurar a página para a versão original? Isso descarta textos editados e o CSS personalizado salvos neste navegador.')) return;
-    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-    location.reload();
-  });
-
-  downloadBtn.addEventListener('click', function(){
-    var clone = document.documentElement.cloneNode(true);
-    /* remove edit-mode UI itself from the exported file */
-    clone.querySelectorAll('.edit-fab, .edit-panel, #editToast, #edit-mode-base-style').forEach(function(n){ n.remove(); });
-    clone.querySelectorAll('[contenteditable]').forEach(function(n){ n.removeAttribute('contenteditable'); });
-    clone.classList.remove('edit-mode-on');
-    var html = '<!DOCTYPE html>\n' + clone.outerHTML;
-    var blob = new Blob([html], {type:'text/html'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'joao-siqueira-portfolio.html';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Arquivo baixado');
-  });
-})();
-</script>
 </body>
 </html>

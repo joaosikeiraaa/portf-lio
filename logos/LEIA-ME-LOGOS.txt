@@ -1,0 +1,34 @@
+========================================================
+  PASTA DE LOGOS DAS MARCAS
+========================================================
+
+Coloque aqui os logos das marcas/empresas com quem voce
+ja trabalhou. Eles aparecem AUTOMATICAMENTE na faixa
+"Marcas que confiam", rolando em loop.
+
+COMO NOMEAR (muito importante)
+------------------------------------------------
+Use exatamente este padrao, em sequencia:
+   marca-01.png
+   marca-02.png
+   marca-03.png
+   ... ate marca-30.png
+
+- Sempre com o traco e dois digitos (01, 02, ...09, 10).
+- Sempre em .png
+- Pode ter de 1 ate 30 logos.
+
+DICAS PARA FICAR BONITO
+------------------------------------------------
+- Use PNG com FUNDO TRANSPARENTE (sem retangulo branco).
+- Pode ser o logo em branco ou colorido: o site mostra
+  ele em cinza claro e, ao passar o mouse, revela a cor.
+- Tamanho sugerido: ~600 x 300 px (mais largo que alto).
+
+OBSERVACAO
+------------------------------------------------
+- Enquanto NAO houver nenhum logo aqui, a secao "Marcas"
+  fica escondida no site (nao aparece faixa vazia).
+- Assim que voce adicionar pelo menos 1, a secao aparece.
+- Ao subir no GitHub, suba a pasta "logos" junto com o
+  index.html (igual a pasta "fotos").
